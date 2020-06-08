@@ -33,21 +33,25 @@ public class NavigationActivity extends AppCompatActivity implements DefaultHard
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addDefaultSplashLayout();
-        navigator = new Navigator(this,
-                new ChildControllersRegistry(),
-                new ModalStack(this),
-                new OverlayManager(),
-                new RootPresenter(this)
-        );
-        navigator.bindViews();
-        getReactGateway().onActivityCreated(this);
+        if (isTaskRoot()) {
+            addDefaultSplashLayout();
+            navigator = new Navigator(this,
+                    new ChildControllersRegistry(),
+                    new ModalStack(this),
+                    new OverlayManager(),
+                    new RootPresenter(this)
+            );
+            navigator.bindViews();
+            getReactGateway().onActivityCreated(this);
+        }
     }
 
     @Override
     public void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        navigator.setContentLayout(findViewById(android.R.id.content));
+        if (navigator != null) {
+            navigator.setContentLayout(findViewById(android.R.id.content));
+        }
     }
 
     @Override
@@ -72,8 +76,10 @@ public class NavigationActivity extends AppCompatActivity implements DefaultHard
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        navigator.destroy();
-        getReactGateway().onActivityDestroyed(this);
+        if (navigator != null) {
+            navigator.destroy();
+            getReactGateway().onActivityDestroyed(this);
+        }
     }
 
     @Override
@@ -127,7 +133,9 @@ public class NavigationActivity extends AppCompatActivity implements DefaultHard
 
     @Override
     public void onReload() {
-        navigator.destroyViews();
+        if (navigator != null) {
+            navigator.destroyViews();
+        }
     }
 
     protected void addDefaultSplashLayout() {
